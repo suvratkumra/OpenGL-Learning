@@ -2,6 +2,73 @@
 #include <GLFW/glfw3.h>
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+
+
+struct ShaderSourceString
+{
+	std::string vertex_source;
+	std::string fragment_source;
+};
+
+// we will get the file we want to parse shaders from
+static ShaderSourceString ParseShader(std::string path)
+{
+	// read the file
+	std::ifstream stream(path);
+	// error checking
+	if (!stream.is_open())
+	{
+		std::cerr << "Error opening the file " << path;
+	}
+
+	// as we have 2 shader types in the shader file, so having an array of stringstream
+	std::stringstream ss[2];
+
+	// making an enum class so that we can cast it to int later for the index of stringstream
+	enum class SourceType
+	{
+		NONE = -1,
+		VERTEX = 0,
+		FRAGMENT = 1
+	};
+
+	// initially it is set to nun
+	SourceType current_source_type = SourceType::NONE;
+
+	// now we will start by reading from the file and first do the checking if #shader word is found or not
+	std::string line;
+	while (std::getline(stream, line))
+	{
+		// line has the line stored from the file.
+
+		// This is just like how you would do for maps/sets, finding a word from the given string (line)
+		if (line.find("#shader") != std::string::npos)
+		{
+			// now we want to set the stringstream accordingly for reading.
+			if (line.find("vertex") != std::string::npos)
+			{
+				// set the source type to vertex as we want it's int value as ss's index now
+				current_source_type = SourceType::VERTEX;
+			}
+			else if (line.find("fragment") != std::string::npos)
+			{
+				// set the source type to fragment now
+				current_source_type = SourceType::FRAGMENT;
+			}
+		}
+		else
+		{
+			// now we have the required source stored, use that to put line in corresponding stream.
+			ss[(int)current_source_type] << line << '\n';
+		}
+	}
+	// now we have more than 1 string we want to return, so making a struct for that purpose.
+	return { ss[0].str(), ss[1].str() };
+
+}
 
 
 static unsigned int CompileShader(unsigned int type, const std::string& source)
@@ -55,36 +122,6 @@ static unsigned int CreateShader(const std::string& vertex_shader, const std::st
 
 }
 
-static std::string CreateFragmentShaderString()
-{
-	std::string fragment_shader =
-		"#version 330 core\n"
-		"\n"
-		"layout(location = 0) out vec4 color;"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"color = vec4(1.0, 0.0, 0.0, 1.0);"
-		"}\n";
-
-	return fragment_shader;
-}
-
-static std::string CreateVertexShaderString()
-{
-	std::string vertex_shader =
-		"#version 330 core\n"
-		"\n"
-		"layout(location = 0) in vec4 position;"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"gl_Position = position;"
-		"}\n";
-
-	return vertex_shader;
-}
-
 int main(void)
 {
 	GLFWwindow* window;
@@ -118,10 +155,12 @@ int main(void)
 	};
 
 	// creating our shaders
-	std::string fragment_shader = CreateFragmentShaderString();
-	std::string vertex_shader = CreateVertexShaderString();
+	std::string fragment_shader;
+	std::string vertex_shader;
 
-	unsigned int shader_program = CreateShader(vertex_shader, fragment_shader);
+	ShaderSourceString shader_sources = ParseShader("res/shaders/Basic.shader");
+
+	unsigned int shader_program = CreateShader(shader_sources.vertex_source, shader_sources.fragment_source);
 	glUseProgram(shader_program);
 
 	// Creating our 1 buffer, with "buffer" as the unique ID of this buffer, 
