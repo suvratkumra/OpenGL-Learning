@@ -16,5 +16,6 @@
    * Do not forget to enable the attribute so that it can be drawn on the screen by [glEnableVertexAttribArray](https://docs.gl/gl4/glEnableVertexAttribArray)
    * Now if you run the code (without the vertex and fragment shader set up, it will run fine only if the code is really simple like a triangle or something but in good practice you should write your own vertex and Fragment Shader)
    * [**Shaders**](https://learnopengl.com/Getting-started/Shaders): 
-      * Vertex Shader (ext: .vert) -> Ran for every vertex in the screen / passed by CPU to GPU if clipping not enabled.
-      * Fragment Shader (ext: .frag) -> Ran for every pixel between the vertex but depends on how you set your vertices up.
+      * Vertex Shader -> Ran for every vertex in the screen / passed by CPU to GPU if clipping not enabled.
+      * Fragment Shader -> Ran for every pixel between the vertex but depends on how you set your vertices up.
+      * **NOTE: For this project, I made only one file for shaders (containing both fragment and vertex shaders), used stringstream and enums to easily read from the new file about frgamnet and vertex resulting in cleaner code.** 
