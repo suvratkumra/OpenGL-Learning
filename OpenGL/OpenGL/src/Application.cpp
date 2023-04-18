@@ -3,6 +3,88 @@
 
 #include <iostream>
 
+
+static unsigned int CompileShader(unsigned int type, const std::string& source)
+{
+	unsigned int id = glCreateShader(type);
+	const char* src = source.c_str();
+	glShaderSource(id, 1, &src, nullptr);
+	glCompileShader(id);
+
+	// Error handling
+	int result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE)
+	{
+		// get the log message now.
+		int length;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+		char* error_message = (char*)alloca(length * sizeof(char));
+		glGetShaderInfoLog(id, length, &length, error_message);
+		std::cout << "Failed to compile shader: " << source.c_str() << std::endl;
+		std::cout << error_message << std::endl;
+
+		// delete the shader as it failed anyways
+		glDeleteShader(id);
+
+		return 0;
+	}
+
+	return id;
+}
+
+static unsigned int CreateShader(const std::string& vertex_shader, const std::string& fragment_shader)
+{
+	unsigned int program = glCreateProgram();
+	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertex_shader);
+	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragment_shader);
+
+	glAttachShader(program, vs);
+	glAttachShader(program, fs);
+
+	glLinkProgram(program);
+
+	glValidateProgram(program);
+
+
+	// now the program has all the shader linked so we can dleete the shader intermediary files
+	glDeleteShader(vs);
+	glDeleteShader(fs);
+
+	return program;
+
+}
+
+static std::string CreateFragmentShaderString()
+{
+	std::string fragment_shader =
+		"#version 330 core\n"
+		"\n"
+		"layout(location = 0) out vec4 color;"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"color = vec4(1.0, 0.0, 0.0, 1.0);"
+		"}\n";
+
+	return fragment_shader;
+}
+
+static std::string CreateVertexShaderString()
+{
+	std::string vertex_shader =
+		"#version 330 core\n"
+		"\n"
+		"layout(location = 0) in vec4 position;"
+		"\n"
+		"void main()\n"
+		"{\n"
+		"gl_Position = position;"
+		"}\n";
+
+	return vertex_shader;
+}
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -34,6 +116,13 @@ int main(void)
 		0.5, -0.5,
 		-0.5, 0.5
 	};
+
+	// creating our shaders
+	std::string fragment_shader = CreateFragmentShaderString();
+	std::string vertex_shader = CreateVertexShaderString();
+
+	unsigned int shader_program = CreateShader(vertex_shader, fragment_shader);
+	glUseProgram(shader_program);
 
 	// Creating our 1 buffer, with "buffer" as the unique ID of this buffer, 
 	// in future, we can simply tell OpenGL use this buffer and draw me whats
