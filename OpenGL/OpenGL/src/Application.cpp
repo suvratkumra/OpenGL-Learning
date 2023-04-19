@@ -148,10 +148,17 @@ int main(void)
 	std::cout << glGetString(GL_VERSION);
 
 	// Position for our triangle data
-	float positions[6] = {
+	float positions[] = {
 		0.5, 0.5,
+		-0.5, 0.5,
 		0.5, -0.5,
-		-0.5, 0.5
+		-0.5, -0.5
+	};
+
+	// For glDrawElements 
+	unsigned int element_indices[] = {
+		0,1,2,
+		1,3,2
 	};
 
 	// creating our shaders
@@ -175,7 +182,7 @@ int main(void)
 	// Tell OpenGL about the data contained in the buffer.
 	// This tells opengl that the data is array buffer, with 6 floats and draw it statically
 	// meaning it will contain information once but should be drawed multiple times. 
-	glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), positions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), positions, GL_STATIC_DRAW);
 
 	// now we need to tell OpenGL one by one about what attribute is stored at what position,
 	// right now we just have one position in our vertex(as it can contain other information as well)
@@ -184,17 +191,25 @@ int main(void)
 	// enable the attribute.
 	glEnableVertexAttribArray(0);
 
+	// creating element IBO
+	unsigned int ibo;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), element_indices, GL_STATIC_DRAW);
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glBegin(GL_TRIANGLES);
-		glVertex2f(0.5, 0.5);
-		glVertex2f(0.5, -0.5);
-		glVertex2f(-0.5, 0.5);
-		glEnd();
+		//glBegin(GL_TRIANGLES);
+		//glVertex2f(0.5, 0.5);
+		//glVertex2f(0.5, -0.5);
+		//glVertex2f(-0.5, 0.5);
+		//glEnd();
+
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
