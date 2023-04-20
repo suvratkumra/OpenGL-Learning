@@ -5,6 +5,28 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <intrin.h>
+
+
+#define ASSERT(x) if(!(x)) __debugbreak()
+#define GLCALL(x) GLClearErrors();\
+x;\
+ASSERT(GLLog(#x, __FILE__, __LINE__))
+
+static void GLClearErrors()
+{
+	while (glGetError() != GL_NO_ERROR);
+}
+
+static bool GLLog(const char* function, const char* file, int line)
+{
+	if (GLenum error_code = glGetError())
+	{
+		std::cout << std::endl << "[OpenGL error]: " << error_code << " on line: " << line << " in file: " << file;
+		return false;
+	}
+	return true;
+}
 
 
 struct ShaderSourceString
@@ -209,8 +231,9 @@ int main(void)
 		//glVertex2f(-0.5, 0.5);
 		//glEnd();
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		GLClearErrors();
 
+		GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 
