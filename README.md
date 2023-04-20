@@ -12,8 +12,8 @@
     * Generate Buffer(with unique buffer as later if you have a lot of buffers, you just need to tell OpenGL that use this buffer with this unique ID.) 
     * Select the Buffer you want to bind to the memory.  
     * If you know what is the buffer data, then tell OpenGL about the data as well in here. But even after doing this OpenGL does not know about how to interpret the data you told it right now. 
-   * To combat this issue and tell OpenGL how to read/interpret the data, we use ``[glVertexAttribPointer](https://docs.gl/gl4/glVertexAttribPointer)``
-   * Do not forget to enable the attribute so that it can be drawn on the screen by ``[glEnableVertexAttribArray](https://docs.gl/gl4/glEnableVertexAttribArray)``
+   * To combat this issue and tell OpenGL how to read/interpret the data, we use ``[glVertexAttribPointer]``(https://docs.gl/gl4/glVertexAttribPointer)
+   * Do not forget to enable the attribute so that it can be drawn on the screen by ``[glEnableVertexAttribArray]``(https://docs.gl/gl4/glEnableVertexAttribArray)
    * Now if you run the code (without the vertex and fragment shader set up, it will run fine only if the code is really simple like a triangle or something but in good practice you should write your own vertex and Fragment Shader)
    * [**Shaders**](https://learnopengl.com/Getting-started/Shaders): 
       * Vertex Shader -> Ran for every vertex in the screen / passed by CPU to GPU if clipping not enabled.
