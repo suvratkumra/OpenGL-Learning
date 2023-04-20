@@ -190,34 +190,38 @@ int main(void)
 	ShaderSourceString shader_sources = ParseShader("res/shaders/Basic.shader");
 
 	unsigned int shader_program = CreateShader(shader_sources.vertex_source, shader_sources.fragment_source);
-	glUseProgram(shader_program);
+	GLCALL(glUseProgram(shader_program));
 
 	// Creating our 1 buffer, with "buffer" as the unique ID of this buffer, 
 	// in future, we can simply tell OpenGL use this buffer and draw me whats
 	// in it.
 	unsigned int buffer;
-	glGenBuffers(1, &buffer);
+	GLCALL(glGenBuffers(1, &buffer));
 
 	// Selecting which buffer to use, here selecting buffer.
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	GLCALL(glBindBuffer(GL_ARRAY_BUFFER, buffer));
 
 	// Tell OpenGL about the data contained in the buffer.
 	// This tells opengl that the data is array buffer, with 6 floats and draw it statically
 	// meaning it will contain information once but should be drawed multiple times. 
-	glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), positions, GL_STATIC_DRAW);
+	GLCALL(glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), positions, GL_STATIC_DRAW));
 
 	// now we need to tell OpenGL one by one about what attribute is stored at what position,
 	// right now we just have one position in our vertex(as it can contain other information as well)
 	// we just create one attribute.
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+	GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
 	// enable the attribute.
-	glEnableVertexAttribArray(0);
+	GLCALL(glEnableVertexAttribArray(0));
 
 	// creating element IBO
 	unsigned int ibo;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), element_indices, GL_STATIC_DRAW);
+	GLCALL(glGenBuffers(1, &ibo));
+	GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
+	GLCALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), element_indices, GL_STATIC_DRAW));
+
+	// calling the shader variable and passing in a value
+	GLCALL(int location_color = glGetUniformLocation(shader_program, "u_Color"));
+	GLCALL(glUniform4f(location_color, 0.5, 0.5, 0.5, 1.0));
 
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
