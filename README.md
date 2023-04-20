@@ -19,3 +19,7 @@
       * Vertex Shader -> Ran for every vertex in the screen / passed by CPU to GPU if clipping not enabled.
       * Fragment Shader -> Ran for every pixel between the vertex but depends on how you set your vertices up.
       * **NOTE: For this project, I made only one file for shaders (containing both fragment and vertex shaders), used stringstream and enums to easily read from the new file about frgamnet and vertex resulting in cleaner code.** 
+   * Using compiler intrinsic function for error checking with OpenGL. For visual studio 2022, to set a breakpoint from within the code I have used ``__debugbreak()``, again this is compiler intrinsic and varies from compiler to compiler.
+   * I have used other macros as well which are not compiler intrinsic and should work for everyone:
+      * To get file path in which error occured I used __FILE__.
+      * To get the line on which the error occured, I use __LINE__.
