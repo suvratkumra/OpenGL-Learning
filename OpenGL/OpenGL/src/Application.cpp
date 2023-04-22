@@ -6,28 +6,11 @@
 #include <string>
 #include <sstream>
 #include <intrin.h>
+#include <memory>
 
-
-#define ASSERT(x) if(!(x)) __debugbreak()
-#define GLCALL(x) GLClearErrors();\
-x;\
-ASSERT(GLLog(#x, __FILE__, __LINE__))
-
-static void GLClearErrors()
-{
-	while (glGetError() != GL_NO_ERROR);
-}
-
-static bool GLLog(const char* function, const char* file, int line)
-{
-	if (GLenum error_code = glGetError())
-	{
-		std::cout << std::endl << "[OpenGL error]: " << error_code << " on line: " << line << " in file: " << file;
-		return false;
-	}
-	return true;
-}
-
+#include "Renderer.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
 
 struct ShaderSourceString
 {
@@ -203,20 +186,8 @@ int main(void)
 	unsigned int shader_program = CreateShader(shader_sources.vertex_source, shader_sources.fragment_source);
 	GLCALL(glUseProgram(shader_program));
 
-	// Creating our 1 buffer, with "buffer" as the unique ID of this buffer, 
-	// in future, we can simply tell OpenGL use this buffer and draw me whats
-	// in it.
-	unsigned int buffer;
-	GLCALL(glGenBuffers(1, &buffer));
-
-	// Selecting which buffer to use, here selecting buffer.
-	GLCALL(glBindBuffer(GL_ARRAY_BUFFER, buffer));
-
-	// Tell OpenGL about the data contained in the buffer.
-	// This tells opengl that the data is array buffer, with 6 floats and draw it statically
-	// meaning it will contain information once but should be drawed multiple times. 
-	GLCALL(glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(float), positions, GL_STATIC_DRAW));
-
+	std::unique_ptr<VertexBuffer> vertex_buffer = std::make_unique<VertexBuffer>(positions, sizeof(float) * 8);
+	
 	// now we need to tell OpenGL one by one about what attribute is stored at what position,
 	// right now we just have one position in our vertex(as it can contain other information as well)
 	// we just create one attribute.
@@ -224,11 +195,7 @@ int main(void)
 	// enable the attribute.
 	GLCALL(glEnableVertexAttribArray(0));
 
-	// creating element IBO
-	unsigned int ibo;
-	GLCALL(glGenBuffers(1, &ibo));
-	GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-	GLCALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), element_indices, GL_STATIC_DRAW));
+	std::unique_ptr<IndexBuffer> index_buffer = std::make_unique<IndexBuffer>(element_indices, 6);
 
 	// calling the shader variable and passing in a value
 	GLCALL(int location_color = glGetUniformLocation(shader_program, "u_Color"));
@@ -240,6 +207,9 @@ int main(void)
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
+		GLCALL(glBindVertexArray(vao));
+		index_buffer->Bind();
+
 		GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
 		/* Swap front and back buffers */
@@ -248,6 +218,8 @@ int main(void)
 		/* Poll for and process events */
 		glfwPollEvents();
 	}
+	index_buffer.release();
+	vertex_buffer.release();
 
 	glfwTerminate();
 	return 0;
