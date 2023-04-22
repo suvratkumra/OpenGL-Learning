@@ -23,3 +23,11 @@
    * I have used other macros as well which are not compiler intrinsic and should work for everyone:
       * To get file path in which error occured I used [``__FILE__``](https://www.cprogramming.com/reference/preprocessor/__FILE__.html).
       * To get the line on which the error occured, I use [``__LINE__``](https://www.cprogramming.com/reference/preprocessor/__LINE__.html).
+   * In this project I am using different VAO for every object instead of one global VAO for all and then binding them before rendering them in render loop. This is a personal preference and I would later change to 1 VAO for all buffers if there is performance boost in that. 
+   * I have also changed my OpenGL environment to be ``CORE`` instead of ``COMPAT`` which stands for compatibility. (Core comes with no default VAO's but Compat does)
+      * Using the code 
+      ```
+         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);   // using version 3.x
+         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);   // using version x.3 (together it makes 3.3)
+         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // setting the profile of our environment to CORE profile instead of compat
+      ```
