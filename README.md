@@ -31,3 +31,6 @@
          glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);   // using version x.3 (together it makes 3.3)
          glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // setting the profile of our environment to CORE profile instead of compat
       ```
+   * One thing about openGL is that when you do [``glfwTerminate()``](https://www.glfw.org/docs/3.1/group__init.html), it only cleans up opengl stuff and all the instances of any opengl object you might have, here in the code I have abstracted vertex buffer, index buffer, etc in classes and due to the main loop in ``Application.cpp`` none of them were terminated before ``glfwTerminate()``. So to fix this issue of our objects not being cleared properly we could either do:
+      * Heap Allocation (making a pointer and deleting it before calling ``glfwTerminate``.
+      * Wrap the entire code into a scope using curly braces ``{}``.  
