@@ -152,6 +152,12 @@ int main(void)
 	if (!glfwInit())
 		return -1;
 
+	// Changing the mode of opengl to be core instead of compat
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);   // using version 3.x
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);   // using version x.3 (together it makes 3.3)
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	
 
 	/* Create a windowed mode window and its OpenGL context */
 	window = glfwCreateWindow(640, 480, "Hello World", NULL, NULL);
@@ -182,6 +188,11 @@ int main(void)
 		0,1,2,
 		1,3,2
 	};
+
+	/* Now there is no vertex buffer object as we just turned the mode to core instead of compat */
+	unsigned int vao;
+	GLCALL(glCreateVertexArrays(1, &vao));
+	GLCALL(glBindVertexArray(vao));
 
 	// creating our shaders
 	std::string fragment_shader;
@@ -229,15 +240,8 @@ int main(void)
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//glBegin(GL_TRIANGLES);
-		//glVertex2f(0.5, 0.5);
-		//glVertex2f(0.5, -0.5);
-		//glVertex2f(-0.5, 0.5);
-		//glEnd();
-
-		GLClearErrors();
-
 		GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
+
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 
