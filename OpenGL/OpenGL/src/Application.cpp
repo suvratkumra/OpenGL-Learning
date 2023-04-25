@@ -11,6 +11,8 @@
 #include "Renderer.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "VertexArray.h"
+#include "VertexBufferLayout.h"
 
 struct ShaderSourceString
 {
@@ -172,10 +174,6 @@ int main(void)
 		1,3,2
 	};
 
-	/* Now there is no vertex buffer object as we just turned the mode to core instead of compat */
-	unsigned int vao;
-	GLCALL(glCreateVertexArrays(1, &vao));
-	GLCALL(glBindVertexArray(vao));
 
 	// creating our shaders
 	std::string fragment_shader;
@@ -186,14 +184,12 @@ int main(void)
 	unsigned int shader_program = CreateShader(shader_sources.vertex_source, shader_sources.fragment_source);
 	GLCALL(glUseProgram(shader_program));
 
+	VertexArray va;
 	std::unique_ptr<VertexBuffer> vertex_buffer = std::make_unique<VertexBuffer>(positions, sizeof(float) * 8);
+	VertexBufferLayout layout;
+	layout.Push<float>(2);
+	va.AddBuffer(*vertex_buffer, layout);
 	
-	// now we need to tell OpenGL one by one about what attribute is stored at what position,
-	// right now we just have one position in our vertex(as it can contain other information as well)
-	// we just create one attribute.
-	GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0));
-	// enable the attribute.
-	GLCALL(glEnableVertexAttribArray(0));
 
 	std::unique_ptr<IndexBuffer> index_buffer = std::make_unique<IndexBuffer>(element_indices, 6);
 
@@ -207,9 +203,8 @@ int main(void)
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		GLCALL(glBindVertexArray(vao));
+		va.Bind();
 		index_buffer->Bind();
-
 		GLCALL(glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr));
 
 		/* Swap front and back buffers */

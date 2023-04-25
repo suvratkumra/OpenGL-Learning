@@ -21,14 +21,14 @@ VertexBuffer::~VertexBuffer()
 	GLCALL(glBindBuffer(GL_ARRAY_BUFFER, 0));
 }
 
-void VertexBuffer::Bind()
+void VertexBuffer::Bind() const
 {
 	// Selecting which buffer to use, here selecting buffer.
 	GLCALL(glBindBuffer(GL_ARRAY_BUFFER, renderer_id_));
 
 }
 
-void VertexBuffer::Unbind()
+void VertexBuffer::Unbind() const
 {
 	// Selecting which buffer to use, here selecting buffer.
 	GLCALL(glBindBuffer(GL_ARRAY_BUFFER, renderer_id_));

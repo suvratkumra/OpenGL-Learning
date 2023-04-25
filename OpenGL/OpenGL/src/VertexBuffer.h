@@ -13,8 +13,8 @@ public:
 	~VertexBuffer();
 
 	// To bind the vertex buffer id of the object with OpenGL 
-	void Bind();
+	void Bind() const;
 
 	// To Unbind the vertex buffer id of the object with OpenGl
-	void Unbind();
+	void Unbind() const;
 };
